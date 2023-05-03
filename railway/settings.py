@@ -15,9 +15,6 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 import os
-# from dotenv import load_dotenv
-
-# load_dotenv()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -42,9 +39,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'app',
     # 'django_social_share'
+    'rest_framework',
+    'corsheaders',
+    'oauth2_provider',
+     'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware', # cors resolving middleware
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -52,7 +55,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'oauth2_provider.middleware.OAuth2TokenMiddleware', # oauth token middleware
     
 ]
 
@@ -80,18 +85,11 @@ WSGI_APPLICATION = 'railway.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
-
 
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'vercel',
+#         'NAME': 'railway',
 #         'USER': 'postgres',
 #         'PASSWORD': '1234',
 #         'HOST':'localhost',
@@ -100,14 +98,19 @@ WSGI_APPLICATION = 'railway.wsgi.application'
 #     }
 # }
 
+from dotenv import load_dotenv
+
+load_dotenv()
+import os
+
 # DATABASES = {
 #     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ["NAME"],
-#         'USER': os.environ["USER"],
-#         'PASSWORD': '1234',
-#         'HOST': os.environ["HOST"],
-#         'PORT': os.environ["PORT"],
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.getenv('DB_NAME'),
+#         'USER': os.getenv('DB_USER'),
+#         'PASSWORD': os.getenv('DB_PASSWORD'),
+#         'HOST': os.getenv('DB_HOST'),
+#         'PORT': os.getenv('DB_PORT'),
 #     }
 # }
 
@@ -172,3 +175,44 @@ DATABASES = {
 }
 
 DISABLE_COLLECTSTATIC = 0
+
+CLIENT_ID = "oASmK1HdbaxhecWiO1rrQIB43cLRfNeHuK7Oupix"
+CLIENT_SECRET = "9vbtQWZWtLqdQMb7Rdc0Y06Qqvv4umQW93ORZaJTpZo9ENbB0hFxXjx9FSdCeFFoQsbMS6VI6B30776J0qCbdGzX53P4IxiyyfBc47iQfQp17VdraVewfC4SVvEyRS48"
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
+   
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        # 'rest_framework.permissions.IsAuthenticated',
+    ],
+
+}
+AUTHENTICATION_BACKENDS = [
+    # 'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+    'oauth2_provider.backends.OAuth2Backend',
+]
+
+
+OAUTH2_PROVIDER = {
+    'ACCESS_TOKEN_EXPIRE_SECONDS': 3600,
+    'AUTHORIZATION_CODE_EXPIRE_SECONDS': 60,
+    'ALLOWED_REDIRECT_URI_SCHEMES': ['http','https'],
+    'REFRESH_TOKEN_EXPIRE_SECONDS': 300,
+    'REQUEST_APPROVAL_PROMPT': 'auto',
+    'ROTATE_REFRESH_TOKENS': True,
+    'SCOPES': {
+        'read': 'Read scope',
+        'write': 'Write scope',
+    },
+}
+
+
+OAUTH_ACCESS_TOKEN_MODEL = 'oauth2_provider.models.AccessToken'# AUTH_USER_MODEL = 'app.User'
+
