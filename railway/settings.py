@@ -81,22 +81,31 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'railway.wsgi.application'
 
+# domain = https://web-production-e388.up.railway.app/
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+import dj_database_url
+
+DATABASE_URL = "postgresql://postgres:ZskHB5mEcAusgHxtMMbx@containers-us-west-197.railway.app:6948/railway"
 
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'railway',
-#         'USER': 'postgres',
-#         'PASSWORD': '1234',
-#         'HOST':'localhost',
-#         'PORT': '5432',
-        
-#     }
+#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
 # }
+
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',
+        'USER': 'postgres',
+        'PASSWORD': '1234',
+        'HOST':'localhost',
+        'PORT': '5432',
+        
+    }
+}
 
 from dotenv import load_dotenv
 
@@ -166,18 +175,14 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-import dj_database_url
-
-DATABASE_URL = "postgresql://postgres:ZskHB5mEcAusgHxtMMbx@containers-us-west-197.railway.app:6948/railway"
-
-DATABASES = {
-    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-}
-
 DISABLE_COLLECTSTATIC = 0
 
-CLIENT_ID = "oASmK1HdbaxhecWiO1rrQIB43cLRfNeHuK7Oupix"
-CLIENT_SECRET = "9vbtQWZWtLqdQMb7Rdc0Y06Qqvv4umQW93ORZaJTpZo9ENbB0hFxXjx9FSdCeFFoQsbMS6VI6B30776J0qCbdGzX53P4IxiyyfBc47iQfQp17VdraVewfC4SVvEyRS48"
+# CLIENT_ID = "oASmK1HdbaxhecWiO1rrQIB43cLRfNeHuK7Oupix"
+# CLIENT_SECRET = "9vbtQWZWtLqdQMb7Rdc0Y06Qqvv4umQW93ORZaJTpZo9ENbB0hFxXjx9FSdCeFFoQsbMS6VI6B30776J0qCbdGzX53P4IxiyyfBc47iQfQp17VdraVewfC4SVvEyRS48"
+
+
+CLIENT_ID = "4c74TFuO4Qtg7I7jI03cjLzVqDjETK6MDZ8fqNvf"
+CLIENT_SECRET = "l5OTcrVUd20Vc4jocESIU6gzFoTYK45SNoYTi1FaNgZVOOLVyy01zz4uKO53GU4JQugkbvZiwJ4kj3Bjac1LtO5BnnXVKGmPeuJJZt63GspD3XuV2fO7VcoxNW5MJmR9"
 
 
 REST_FRAMEWORK = {

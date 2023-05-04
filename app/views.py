@@ -115,7 +115,7 @@ def login_user(request):
     # check email has registered
     user = authenticate(request, username=username, password=password)
 
-    token_url = "http://localhost:8000/o/token/"
+    token_url = "https://web-production-e388.up.railway.app/o/token/"
     data = {
         "grant_type": "password",
         "username": username,

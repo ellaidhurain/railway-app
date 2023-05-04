@@ -5,8 +5,9 @@ from django.core.validators import FileExtensionValidator
 import random
 
 def generate_random_code():
-    code = ''.join(str(random.randint(0, 9)) for _ in range(6))
+    code = ''.join(str(random.randint(0, 9)) for i in range(6))
     return code
+
 
 class ChatRoom(models.Model):
     name = models.CharField(max_length=50, unique=True) 
