@@ -21,6 +21,8 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView as BaseTokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
+from datetime import datetime, timedelta
+import jwt
 
 
 # Create your views here.
@@ -45,6 +47,41 @@ def create_user(request):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["POST"])
+def login_user(request):
+    # get user input
+    username = request.data["username"]
+    password = request.data["password"]
+    
+     # check if user exists and is active
+    user = authenticate(request, username=username, password=password)
+    if user is None:
+        return Response({"detail": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
+    elif not user.is_active:
+        return Response({"detail": "User is inactive"}, status=status.HTTP_400_BAD_REQUEST)
+
+   # send payload to verify in decode
+    payload = {
+        "user": {
+            "id": user.id,
+            "email": user.email,
+            "exp": (datetime.utcnow() + timedelta(minutes=15)).isoformat(),
+            "iat": datetime.utcnow().isoformat(),
+        }
+    }
+     # generate JWT tokens
+    access_token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
+    refresh_token = RefreshToken.for_user(user)
+
+    token = {"refresh": str(refresh_token), "access": access_token}
+
+    # create response object
+    response = Response(status=status.HTTP_200_OK)
+    response['Authorization'] = f'Bearer {access_token}'
+    response['Refresh-Token'] = str(refresh_token)
+    return response
 
 
 @func_token_required
@@ -89,102 +126,87 @@ def delete_user(request, user_id):
     user.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+
+
 # @api_view(["POST"])
 # def login_user(request):
 #     # get user input
 #     username = request.data["username"]
 #     password = request.data["password"]
 
-#     # check if user exists and is active
+#     # check email has registered
 #     user = authenticate(request, username=username, password=password)
-#     if user is None or not user.is_active:
-#         return Response({"detail": "Invalid username or password"}, status=status.HTTP_400_BAD_REQUEST)
 
-#     # generate JWT token
-#     refresh = RefreshToken.for_user(user)
-#     token = {"refresh": str(refresh), "access": str(refresh.access_token)}
-#     return Response(token, status=status.HTTP_200_OK)
+#     token_url = "https://web-production-e388.up.railway.app/o/token/"
+#     data = {
+#         "grant_type": "password",
+#         "username": username,
+#         "password": password,
+#         "client_id": settings.CLIENT_ID,
+#         "client_secret": settings.CLIENT_SECRET,
+#     }
 
+#     try:
+#         response = requests.post(
+#             token_url,
+#             data=data,
+#             headers={
+#                 "X-CSRFToken": csrf.get_token(request),
+#                 "Content-Type": "application/x-www-form-urlencoded",
+#             },
+#         )
+#         response.raise_for_status()
+#         full_token = response.json()
+#         access_token = response.json().get("access_token")
+#         refresh_token = response.json().get("refresh_token")
 
-@api_view(["POST"])
-def login_user(request):
-    # get user input
-    username = request.data["username"]
-    password = request.data["password"]
+#         headers = {
+#             "Authorization": f"Bearer {access_token}",
+#             "Content-Type": "application/json",
+#             "refresh_token": refresh_token,
+#         }
+#         res = Response()
 
-    # check email has registered
-    user = authenticate(request, username=username, password=password)
+#     except requests.exceptions.HTTPError as error:
+#         return Response(
+#             {"detail": "Could not get access token"},
+#             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+#         )
 
-    token_url = "https://web-production-e388.up.railway.app/o/token/"
-    data = {
-        "grant_type": "password",
-        "username": username,
-        "password": password,
-        "client_id": settings.CLIENT_ID,
-        "client_secret": settings.CLIENT_SECRET,
-    }
+#     # return token in response
+#     return Response(
+#         # {"oauth_token": full_token},
+#         status=status.HTTP_200_OK,
+#         headers=headers,
+#     )
 
-    try:
-        response = requests.post(
-            token_url,
-            data=data,
-            headers={
-                "X-CSRFToken": csrf.get_token(request),
-                "Content-Type": "application/x-www-form-urlencoded",
-            },
-        )
-        response.raise_for_status()
-        full_token = response.json()
-        access_token = response.json().get("access_token")
-        refresh_token = response.json().get("refresh_token")
-
-        headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/json",
-            "refresh_token": refresh_token,
-        }
-        res = Response()
-
-    except requests.exceptions.HTTPError as error:
-        return Response(
-            {"detail": "Could not get access token"},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
-
-    # return token in response
-    return Response(
-        # {"oauth_token": full_token},
-        status=status.HTTP_200_OK,
-        headers=headers,
-    )
-
-@api_view(["POST"])
-def token(request):
-    r = requests.post(
-        "http://localhost:8000/o/token/",
-        data={
-            "grant_type": "password",
-            "username": request.data["username"],
-            "password": request.data["password"],
-            "client_id": settings.CLIENT_ID,
-            "client_secret": settings.CLIENT_SECRET,
-        },
-    )
-    return Response(r.json())
+# @api_view(["POST"])
+# def token(request):
+#     r = requests.post(
+#         "http://localhost:8000/o/token/",
+#         data={
+#             "grant_type": "password",
+#             "username": request.data["username"],
+#             "password": request.data["password"],
+#             "client_id": settings.CLIENT_ID,
+#             "client_secret": settings.CLIENT_SECRET,
+#         },
+#     )
+#     return Response(r.json())
 
 
-@api_view(["POST"])
-def refresh_token(request):
-    r = requests.post(
-        "http://localhost:8000/o/token/",
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": request.data["refresh_token"],
-            "client_id": settings.CLIENT_ID,
-            "client_secret": settings.CLIENT_SECRET,
-        },
-    )
-    return Response(r.json())
+# @api_view(["POST"])
+# def refresh_token(request):
+#     r = requests.post(
+#         "http://localhost:8000/o/token/",
+#         data={
+#             "grant_type": "refresh_token",
+#             "refresh_token": request.data["refresh_token"],
+#             "client_id": settings.CLIENT_ID,
+#             "client_secret": settings.CLIENT_SECRET,
+#         },
+#     )
+#     return Response(r.json())
 
 
 @func_token_required
