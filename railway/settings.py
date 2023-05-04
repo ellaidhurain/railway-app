@@ -90,22 +90,22 @@ import dj_database_url
 
 DATABASE_URL = "postgresql://postgres:ZskHB5mEcAusgHxtMMbx@containers-us-west-197.railway.app:6948/railway"
 
-# DATABASES = {
-#     "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
-# }
-
-
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'railway',
-        'USER': 'postgres',
-        'PASSWORD': '1234',
-        'HOST':'localhost',
-        'PORT': '5432',
-        
-    }
+    "default": dj_database_url.config(default=DATABASE_URL, conn_max_age=1800),
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'railway',
+#         'USER': 'postgres',
+#         'PASSWORD': '1234',
+#         'HOST':'localhost',
+#         'PORT': '5432',
+        
+#     }
+# }
 
 from dotenv import load_dotenv
 
