@@ -217,6 +217,7 @@ def create_chatroom(request):
     
     data = {'user1': request.user.id, **request.data}
     serializer = OneChatSerializer(data=data)
+    
     if serializer.is_valid():
         chatroom = serializer.save(user1=request.user)
         return Response({'id': chatroom.id, 'code': chatroom.code})
@@ -238,12 +239,13 @@ def join_chatroom(request):
     code = request.data.get('code')
     chatroom = get_object_or_404(ChatRoom, code=code)
     if chatroom.user2 is None:
+          # Check if request.user is user1
+        if chatroom.user1 == request.user:
+            return Response({'detail': 'You cannot join your own chat room.'}, status=400)
+        
         chatroom.user2 = request.user
         chatroom.save()
-        # Adding the CSRF token to the response headers
-        csrf_token = csrf.get_token(request)
-        headers = {'X-CSRFToken': csrf_token}
-
+       
         return Response({'id': chatroom.id, 'name': chatroom.name}, headers=headers)
     else:
         return Response({'detail': 'Chat room is already full.'}, status=400)
