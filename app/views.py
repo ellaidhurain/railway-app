@@ -349,7 +349,7 @@ def delete_one_chat_message(request, message_id):
     message.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-@func_token_required
+# @func_token_required
 @api_view(['POST'])
 def add_song(request):
     serializer = SongSerializer(data=request.data)
