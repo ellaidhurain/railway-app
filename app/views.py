@@ -384,24 +384,29 @@ def delete_song(request,song_id):
     song.delete()
     return Response({"message":"successfully deleted"})
 
-
 @api_view(['GET'])
-def get_song(request, song_id):
-    try:
-        song = Song.objects.get(id=song_id)
-    except Song.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+def get_song(request):
+    songs = Song.objects.all()
 
-    if not song.audio_file:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # Create a list of serialized Song objects with audio files
+    song_data = []
+    for song in songs:
+        serializer = SongSerializer(song)
+        data = serializer.data
 
-    # Open the audio file using Django's file storage API
-    file = song.audio_file.open('rb')
+        # Open the audio file using Django's file storage API
+        audio_file = song.audio_file.open('rb')
 
-    # Set the response headers to indicate that this is an audio file
-    response = FileResponse(file, content_type='audio/mpeg')
+        # Create a FileResponse object for the audio file
+        file_response = FileResponse(audio_file, content_type='audio/mpeg')
 
-    return response
+        # Add the audio file URL to the serialized Song data
+        data['audio_url'] = request.build_absolute_uri(file_response.url)
+
+        # Add the serialized Song data to the list
+        song_data.append(data)
+
+    return Response(song_data)
 
 
 @func_token_required
