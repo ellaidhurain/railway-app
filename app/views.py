@@ -3,6 +3,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 import requests
 from .models import *
+from .models import Favorite
 from .serializers import *
 from rest_framework.decorators import (
     api_view,
@@ -23,11 +24,12 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import AllowAny
 from datetime import datetime, timedelta
 import jwt
+from django.http import FileResponse
 
 
 # Create your views here.
-class TokenObtainPairView(BaseTokenObtainPairView):
-    serializer_class = TokenObtainPairSerializer
+# class TokenObtainPairView(BaseTokenObtainPairView):
+#     serializer_class = TokenObtainPairSerializer
 
 
 @permission_classes([AllowAny])
@@ -75,7 +77,7 @@ def login_user(request):
     access_token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     refresh_token = RefreshToken.for_user(user)
 
-    token = {"refresh": str(refresh_token), "access": access_token}
+    # token = {"refresh": str(refresh_token), "access": access_token}
 
     # create response object
     response = Response(status=status.HTTP_200_OK)
@@ -110,6 +112,7 @@ def update_user(request, user_id):
         return Response(serializer.data)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @func_token_required
@@ -232,21 +235,20 @@ def view_chatroom(request, chatroom_id):
     serializer = OneChatSerializer(chatroom)
     return Response(serializer.data)
 
-
 @func_token_required
 @api_view(['POST'])
 def join_chatroom(request):
     code = request.data.get('code')
     chatroom = get_object_or_404(ChatRoom, code=code)
     if chatroom.user2 is None:
-          # Check if request.user is user1
+        # throw error if request.user is user1
         if chatroom.user1 == request.user:
-            return Response({'detail': 'You cannot join your own chat room.'}, status=400)
-        
+            return Response({'detail': 'You are the owner of the chat room.'}, status=400)
+
         chatroom.user2 = request.user
         chatroom.save()
        
-        return Response({'id': chatroom.id, 'name': chatroom.name}, headers=headers)
+        return Response({'id': chatroom.id, 'name': chatroom.name})
     else:
         return Response({'detail': 'Chat room is already full.'}, status=400)
 
@@ -256,7 +258,6 @@ def delete_chatroom(request, chatroom_id):
     chatroom = get_object_or_404(ChatRoom, id=chatroom_id)
     chatroom.delete()
     return Response(status=204)
-
 
 # --- message ----
 
@@ -303,7 +304,6 @@ def create_one_chat_message(request,chat_room_id):
 
     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-
 @func_token_required
 @api_view(['GET'])
 def list_one_chat_messages(request, chat_room_id):
@@ -337,7 +337,6 @@ def update_one_chat_message(request, message_id):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 @func_token_required
 @api_view(['DELETE'])
 def delete_one_chat_message(request, message_id):
@@ -349,3 +348,66 @@ def delete_one_chat_message(request, message_id):
         )
     message.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+def add_song(request):
+    serializer = SongSerializer(data=request.data)
+    try:
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+    except:
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+@api_view(['GET'])
+def get_song(request):
+    song = Song.objects.all()
+    serializer = SongSerializer(song, many=True)
+    return Response(serializer.data)
+
+@api_view(['PUT'])
+def update_song(request, song_id):
+    try:
+        song = Song.objects.get(id=song_id)
+    except:
+        return Response({"message":"invalid id"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    serializer = SongSerializer(song, data=request.data)
+    
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def delete_song(request,song_id):
+    song = get_object_or_404(Song,id=song_id)
+    song.delete()
+    return Response({"message":"successfully deleted"})
+
+@api_view(['GET'])
+def play_song(request,song_id):
+    audio = get_object_or_404(Song, id=song_id)
+    response = FileResponse(audio.audio_file.open())
+    response['Content-Disposition'] = f'attachment; filename="{audio.audio_file.name}"'
+    return response
+
+@func_token_required
+@api_view(['POST'])
+def add_to_favorites(request,song_id):
+    try:
+        song = Song.objects.get(id=song_id)
+    except Song.DoesNotExist:
+        return Response({'error': 'Song not found'}, status=404)
+    # add to favorite
+    favorites, created = Favorite.object.get_or_create(user=request.user, song=song)
+
+    if not created:
+        #  delete it to remove the song from the user's favorites
+        favorites.delete()
+        message = 'Song removed from favorites'
+    else:
+        message = 'Song added to favorites'
+
+    return Response({'message': message})

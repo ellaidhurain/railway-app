@@ -1,8 +1,9 @@
+import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import FileExtensionValidator
-# Create your models here.
 import random
+from django.forms import ValidationError
 
 def generate_random_code():
     code = ''.join(str(random.randint(0, 9)) for i in range(6))
@@ -32,3 +33,35 @@ class OneChatMessage(models.Model):
     attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['pdf', 'jpg', 'jpeg'])], null=True)
     
    
+class Song(models.Model):
+    title = models.TextField(max_length=100)
+    audio_file = models.FileField(upload_to='audio/')
+    genre = models.CharField(max_length=100)
+    creation_date = models.DateTimeField(auto_now_add=True)
+    attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['pdf', 'jpg', 'jpeg'])], default=None)
+         
+    
+    def __str__(self):
+        return self.title
+
+    def clean(self):
+        """
+        Check that the file size is less than 10MB.
+        """
+        if self.file.size > 10485760:
+            raise ValidationError("The file size is too large. Maximum size is 10MB.")
+        
+    def validate_file(self, value):
+        """
+        Check that the file is an MP3 audio file.
+        """
+        if not value.name.endswith('.mp3'):
+            raise ValidationError("Only MP3 files are allowed.")
+        if not value.content_type.startswith('audio/mp3'):
+            raise ValidationError("Only MP3 audio files are allowed.")
+        return value
+    
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    song = models.ForeignKey(Song, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)

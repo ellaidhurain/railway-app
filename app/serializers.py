@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import *
+from .models import ChatRoom, OneChatMessage, Song, Favorite
 from django.contrib.auth.models import User
 
 
@@ -34,3 +34,15 @@ class OneChatMessageSerializer(serializers.ModelSerializer):
         model = OneChatMessage
         fields = '__all__'
         # depth = 1
+
+
+class SongSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Song
+        fields = '__all__'
+        
+
+class Favorite(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = '__all__'
