@@ -25,7 +25,6 @@ from rest_framework.permissions import AllowAny
 from datetime import datetime, timedelta
 import jwt
 from django.http import FileResponse
-from django.http import FileResponse
 
 
 # Create your views here.
@@ -361,6 +360,12 @@ def add_song(request):
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
  
+@api_view(['GET'])
+def get_song(request):
+    song = Song.objects.all()
+    serializer = SongSerializer(song, many=True)
+    return Response(serializer.data)
+
 @func_token_required
 @api_view(['PUT'])
 def update_song(request, song_id):
@@ -383,31 +388,6 @@ def delete_song(request,song_id):
     song = get_object_or_404(Song,id=song_id)
     song.delete()
     return Response({"message":"successfully deleted"})
-
-@api_view(['GET'])
-def get_song(request):
-    songs = Song.objects.all()
-
-    # Create a list of serialized Song objects with audio files
-    song_data = []
-    for song in songs:
-        serializer = SongSerializer(song)
-        data = serializer.data
-
-        # Open the audio file using Django's file storage API
-        audio_file = song.audio_file.open('rb')
-
-        # Create a FileResponse object for the audio file
-        file_response = FileResponse(audio_file, content_type='audio/mpeg')
-
-        # Add the audio file URL to the serialized Song data
-        data['audio_url'] = request.build_absolute_uri(file_response.url)
-
-        # Add the serialized Song data to the list
-        song_data.append(data)
-
-    return Response(song_data)
-
 
 @func_token_required
 @api_view(['POST'])
