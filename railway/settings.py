@@ -221,3 +221,4 @@ OAUTH2_PROVIDER = {
 
 OAUTH_ACCESS_TOKEN_MODEL = 'oauth2_provider.models.AccessToken'# AUTH_USER_MODEL = 'app.User'
 
+CORS_ORIGIN_ALLOW_ALL = True
