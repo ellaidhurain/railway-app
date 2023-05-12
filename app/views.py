@@ -359,13 +359,14 @@ def add_song(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-    
+ 
 @api_view(['GET'])
 def get_song(request):
     song = Song.objects.all()
     serializer = SongSerializer(song, many=True)
     return Response(serializer.data)
 
+@func_token_required
 @api_view(['PUT'])
 def update_song(request, song_id):
     try:
@@ -381,6 +382,7 @@ def update_song(request, song_id):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@func_token_required
 @api_view(['DELETE'])
 def delete_song(request,song_id):
     song = get_object_or_404(Song,id=song_id)
