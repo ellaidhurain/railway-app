@@ -40,7 +40,6 @@ class Song(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['pdf', 'jpg', 'jpeg'])], default=None)
          
-    
     def __str__(self):
         return self.title
 

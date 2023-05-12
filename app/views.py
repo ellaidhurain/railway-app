@@ -25,6 +25,7 @@ from rest_framework.permissions import AllowAny
 from datetime import datetime, timedelta
 import jwt
 from django.http import FileResponse
+from django.http import FileResponse
 
 
 # Create your views here.
@@ -360,12 +361,6 @@ def add_song(request):
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
  
-@api_view(['GET'])
-def get_song(request):
-    song = Song.objects.all()
-    serializer = SongSerializer(song, many=True)
-    return Response(serializer.data)
-
 @func_token_required
 @api_view(['PUT'])
 def update_song(request, song_id):
@@ -389,12 +384,25 @@ def delete_song(request,song_id):
     song.delete()
     return Response({"message":"successfully deleted"})
 
+
 @api_view(['GET'])
-def play_song(request,song_id):
-    audio = get_object_or_404(Song, id=song_id)
-    response = FileResponse(audio.audio_file.open())
-    response['Content-Disposition'] = f'attachment; filename="{audio.audio_file.name}"'
+def get_song(request, song_id):
+    try:
+        song = Song.objects.get(id=song_id)
+    except Song.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if not song.audio_file:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # Open the audio file using Django's file storage API
+    file = song.audio_file.open('rb')
+
+    # Set the response headers to indicate that this is an audio file
+    response = FileResponse(file, content_type='audio/mpeg')
+
     return response
+
 
 @func_token_required
 @api_view(['POST'])
