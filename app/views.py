@@ -25,8 +25,11 @@ from rest_framework.permissions import AllowAny
 from datetime import datetime, timedelta
 import jwt
 from django.http import FileResponse
-
-
+import base64
+import os
+from django.utils.text import slugify
+from django.http import JsonResponse
+import json
 # Create your views here.
 # class TokenObtainPairView(BaseTokenObtainPairView):
 #     serializer_class = TokenObtainPairSerializer
@@ -360,11 +363,37 @@ def add_song(request):
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
  
-@api_view(['GET'])
-def get_song(request):
-    song = Song.objects.all()
-    serializer = SongSerializer(song, many=True)
-    return Response(serializer.data)
+@api_view(["GET"])
+def get_songs(request):
+    songs = Song.objects.all()
+    data = serializers.serialize('json', songs)
+    
+    # Convert the data to a Python dictionary
+    data_dict = json.loads(data)
+    
+    # Convert the audio_file and attachment fields to data URLs
+    for song in data_dict:
+        song_obj = song['fields']
+        
+        # Check the file type of the audio_file
+        if song_obj['audio_file']:
+            audio_file_type = os.path.splitext(song_obj['audio_file'])[1].lower()
+            if audio_file_type in ['.mp3', '.wav']:
+                # Encode the audio_file as a data URL
+                with open(song_obj['audio_file'], 'rb') as f:
+                    audio_data = base64.b64encode(f.read()).decode('utf-8')
+                    song_obj['audio_file_url'] = f'data:audio/{audio_file_type};base64,{audio_data}'
+        
+        # Check the file type of the attachment
+        if song_obj['attachment']:
+            attachment_type = os.path.splitext(song_obj['attachment'])[1].lower()
+            if attachment_type in ['.jpg', '.jpeg', '.png']:
+                # Encode the attachment as a data URL
+                with open(song_obj['attachment'], 'rb') as f:
+                    attachment_data = base64.b64encode(f.read()).decode('utf-8')
+                    song_obj['attachment_url'] = f'data:image/{attachment_type};base64,{attachment_data}'
+    
+    return JsonResponse(data_dict, safe=False)
 
 @func_token_required
 @api_view(['PUT'])
