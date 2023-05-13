@@ -23,13 +23,11 @@ urlpatterns = [
     path('one_chat_message/delete/<int:message_id>', delete_one_chat_message),
     
     path('lofi/add_song', add_song, name='add_song'),
-    path('lofi/get_song', get_song, name='get_song'),
+    path('lofi/get_songs', get_songs, name='get_songs'),
     path('lofi/update_song/<int:song_id>', update_song, name='update_song'),
     path('lofi/delete_song/<int:song_id>', delete_song, name='delete_song'),
-    path('lofi/play_song/<int:song_id>', play_song, name='play_song'),
+    # path('lofi/play_song/<int:song_id>', play_song, name='play_song'),
     path('lofi/add_to_favorites/<int:song_id>', add_to_favorites, name='add_to_favorites'),
-
-    
-    
+ 
    
 ]

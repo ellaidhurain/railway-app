@@ -37,9 +37,22 @@ class OneChatMessageSerializer(serializers.ModelSerializer):
 
 
 class SongSerializer(serializers.ModelSerializer):
+    audio_file_url = serializers.SerializerMethodField()
+    attachment_url = serializers.SerializerMethodField()
     class Meta:
         model = Song
-        fields = '__all__'
+        fields =   fields = ('id', 'audio_file_url', 'attachment_url', 'title', 'genre', 'creation_date')
+    
+    def get_audio_file_url(self, obj):
+        if obj.audio_file:
+            return self.context['request'].build_absolute_uri(obj.audio_file.url)
+        return None
+    
+    def get_attachment_url(self, obj):
+        if obj.attachment:
+            return self.context['request'].build_absolute_uri(obj.attachment.url)
+        return None
+    
         
 
 class Favorite(serializers.ModelSerializer):
