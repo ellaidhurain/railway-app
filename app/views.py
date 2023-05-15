@@ -80,6 +80,7 @@ def login_user(request):
     access_token = jwt.encode(payload, settings.SECRET_KEY, algorithm="HS256")
     refresh_token = RefreshToken.for_user(user)
 
+    # .
     # token = {"refresh": str(refresh_token), "access": access_token}
 
     # create response object
