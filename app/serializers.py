@@ -39,9 +39,10 @@ class OneChatMessageSerializer(serializers.ModelSerializer):
 class SongSerializer(serializers.ModelSerializer):
     audio_file_url = serializers.SerializerMethodField()
     attachment_url = serializers.SerializerMethodField()
+    
     class Meta:
         model = Song
-        fields =   fields = ('id', 'audio_file_url', 'attachment_url', 'title', 'genre', 'creation_date','audio_file','attachment')
+        fields = ('id', 'audio_file_url', 'attachment_url', 'title', 'genre', 'creation_date','audio_file','attachment')
     
     def get_audio_file_url(self, obj):
         if obj.audio_file:
