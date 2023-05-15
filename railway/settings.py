@@ -20,7 +20,9 @@ import os
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY', 'default_value')
+# SECRET_KEY = os.environ.get('SECRET_KEY', 'default_value')
+SECRET_KEY="django-insecure-2f^e6nfs(633kkx-4bc2^n1l8y6d++#=lcx+c@5fzcfiif2n*q"
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'oauth2_provider',
-     'rest_framework_simplejwt',
+    'rest_framework_simplejwt',
 ]
 
 MIDDLEWARE = [
@@ -107,10 +109,10 @@ DATABASES = {
 #     }
 # }
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
-load_dotenv()
-import os
+# load_dotenv()
+# import os
 
 # DATABASES = {
 #     'default': {
@@ -179,10 +181,6 @@ DISABLE_COLLECTSTATIC = 0
 
 # CLIENT_ID = "oASmK1HdbaxhecWiO1rrQIB43cLRfNeHuK7Oupix"
 # CLIENT_SECRET = "9vbtQWZWtLqdQMb7Rdc0Y06Qqvv4umQW93ORZaJTpZo9ENbB0hFxXjx9FSdCeFFoQsbMS6VI6B30776J0qCbdGzX53P4IxiyyfBc47iQfQp17VdraVewfC4SVvEyRS48"
-
-
-# CLIENT_ID = "4c74TFuO4Qtg7I7jI03cjLzVqDjETK6MDZ8fqNvf"
-# CLIENT_SECRET = "l5OTcrVUd20Vc4jocESIU6gzFoTYK45SNoYTi1FaNgZVOOLVyy01zz4uKO53GU4JQugkbvZiwJ4kj3Bjac1LtO5BnnXVKGmPeuJJZt63GspD3XuV2fO7VcoxNW5MJmR9"
 
 
 REST_FRAMEWORK = {
