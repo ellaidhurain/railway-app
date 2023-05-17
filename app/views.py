@@ -322,7 +322,6 @@ def list_one_chat_messages(request, chat_room_id):
     serializer = OneChatMessageSerializer(queryset, many=True)
     return Response(serializer.data, status.HTTP_200_OK)
 
-
 @func_token_required
 @api_view(['PUT'])
 def update_one_chat_message(request, message_id):
@@ -363,6 +362,7 @@ def add_song(request):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
  
 @api_view(["GET"])
 def get_songs(request):
@@ -370,7 +370,7 @@ def get_songs(request):
     serializer = SongSerializer(songs, many=True, context={'request': request})
     return Response(serializer.data)
     
-@func_token_required
+# @func_token_required
 @api_view(['PUT'])
 def update_song(request, song_id):
     try:
@@ -386,16 +386,16 @@ def update_song(request, song_id):
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@func_token_required
+# @func_token_required
 @api_view(['DELETE'])
 def delete_song(request,song_id):
     song = get_object_or_404(Song,id=song_id)
     song.delete()
     return Response({"message":"successfully deleted"})
 
-@func_token_required
-@api_view(['POST'])
-def add_to_favorites(request,song_id):
+# @func_token_required
+# @api_view(['POST'])
+# def add_to_favorites(request,song_id):
     try:
         song = Song.objects.get(id=song_id)
     except Song.DoesNotExist:
