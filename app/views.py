@@ -356,14 +356,13 @@ def delete_one_chat_message(request, message_id):
 @api_view(['POST'])
 def add_song(request):
     serializer = SongSerializer(data=request.data)
-    try:
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    except:
-        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data,status=status.HTTP_201_CREATED)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
  
 @api_view(["GET"])
