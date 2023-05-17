@@ -376,7 +376,7 @@ def update_song(request, song_id):
     except:
         return Response({"message":"invalid id"}, status=status.HTTP_400_BAD_REQUEST)
     
-    serializer = SongSerializer(song, data=request.data)
+    serializer = SongSerializer(song, data=request.data, context={'request': request})
     
     if serializer.is_valid():
         serializer.save()
