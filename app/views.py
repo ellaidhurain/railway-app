@@ -355,16 +355,13 @@ def delete_one_chat_message(request, message_id):
 # @func_token_required
 @api_view(['POST'])
 def add_song(request):
-    serializer = SongSerializer(data=request.data)
-
+    serializer = SongSerializer(data=request.data, context={'request': request})
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data,status=status.HTTP_201_CREATED)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
- 
 @api_view(["GET"])
 def get_songs(request):
     songs = Song.objects.all()
