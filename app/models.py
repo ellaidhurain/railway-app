@@ -38,7 +38,7 @@ class Song(models.Model):
     audio_file = models.FileField(upload_to='audio/', default=None)
     genre = models.CharField(max_length=100, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
-    attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['pdf', 'jpg', 'jpeg'])], default=None)
+    attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])], default=None)
     artist_name = models.CharField(max_length=100, null=True)
     
     def __str__(self):
