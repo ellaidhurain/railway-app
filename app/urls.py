@@ -25,7 +25,7 @@ urlpatterns = [
     path('lofi/get_songs', get_songs, name='get_songs'),
     path('lofi/update_song/<int:song_id>', update_song, name='update_song'),
     path('lofi/delete_song/<int:song_id>', delete_song, name='delete_song'),
-    path('lofi/add_to_favorites/<int:song_id>', add_to_favorites, name='add_to_favorites'),
+    # path('lofi/add_to_favorites/<int:song_id>', add_to_favorites, name='add_to_favorites'),
  
    
 ]

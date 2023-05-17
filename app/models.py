@@ -34,12 +34,13 @@ class OneChatMessage(models.Model):
     
    
 class Song(models.Model):
-    title = models.TextField(max_length=100)
+    title = models.TextField(max_length=100, null=False)
     audio_file = models.FileField(upload_to='audio/', default=None)
-    genre = models.CharField(max_length=100)
+    genre = models.CharField(max_length=100, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
     attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['pdf', 'jpg', 'jpeg'])], default=None)
-         
+    artist_name = models.CharField(max_length=100, null=True)
+    
     def __str__(self):
         return self.title
 
