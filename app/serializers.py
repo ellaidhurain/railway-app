@@ -41,7 +41,7 @@ class SongSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Song
-        fields = ('id', 'audio_file_url', 'attachment_url', 'title', 'genre', 'creation_date','audio_file','attachment')
+        fields = ('id', 'audio_file_url', 'attachment_url', 'title', 'genre', 'creation_date','audio_file','attachment','artist_name')
     
     def get_audio_file_url(self, obj):
         if obj.audio_file:
