@@ -360,6 +360,8 @@ def add_song(request):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     except:
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
