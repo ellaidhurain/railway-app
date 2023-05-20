@@ -38,7 +38,7 @@ class Song(models.Model):
     audio_file = models.FileField(upload_to='audio/', default=None)
     genre = models.CharField(max_length=100, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
-    attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])], default=None)
+    attachment = models.FileField(upload_to='files',validators=[FileExtensionValidator(['jpg', 'jpeg', 'png','webp'])], default=None)
     artist_name = models.CharField(max_length=100, null=True)
     
     def __str__(self):
@@ -51,16 +51,6 @@ class Song(models.Model):
         if self.file.size > 10485760:
             raise ValidationError("The file size is too large. Maximum size is 10MB.")
         
-    def validate_file(self, value):
-        """
-        Check that the file is an MP3 audio file.
-        """
-        if not value.name.endswith('.mp3'):
-            raise ValidationError("Only MP3 files are allowed.")
-        if not value.content_type.startswith('audio/mp3'):
-            raise ValidationError("Only MP3 audio files are allowed.")
-        return value
-    
 class Favorite(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     song = models.ForeignKey(Song, on_delete=models.CASCADE)
