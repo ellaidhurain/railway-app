@@ -34,7 +34,7 @@ class OneChatMessage(models.Model):
     
    
 class Song(models.Model):
-    title = models.TextField(max_length=100, null=False)
+    title = models.TextField(max_length=100, null=True)
     audio_file = models.FileField(upload_to='audio/', default=None)
     genre = models.CharField(max_length=100, null=True)
     creation_date = models.DateTimeField(auto_now_add=True)
