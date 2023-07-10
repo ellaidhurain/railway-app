@@ -83,7 +83,7 @@ def login_user(request):
     # .
     # token = {"refresh": str(refresh_token), "access": access_token}
 
-    # create response object
+    # create response object and send them to headers
     response = Response(status=status.HTTP_200_OK)
     response['Authorization'] = f'Bearer {access_token}'
     response['Refresh-Token'] = str(refresh_token)
